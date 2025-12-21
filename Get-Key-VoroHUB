@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key System Interface</title>
+    <style>
+        /* Modern dark background (not pitch black) */
+        body {
+            background-color: #1a1a1c;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        /* macOS Style Window */
+        #mac-window {
+            width: 420px;
+            height: 320px;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Title Bar - Height increased for easier dragging */
+        #window-header {
+            height: 48px;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            cursor: move;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border-bottom: 1px solid #d1d1d1;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .red { background: #ff5f56; border: 0.5px solid #e0443e; }
+        .yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
+        .green { background: #27c93f; border: 0.5px solid #1aab29; }
+
+        .window-title {
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        /* Window Content */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px 30px 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        /* Logo Placeholder */
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #007aff, #00c6ff);
+            border-radius: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+        }
+
+        .app-icon svg {
+            width: 35px;
+            height: 35px;
+            fill: white;
+        }
+
+        .info-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .info-sub {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        /* Action Button */
+        .get-key-btn {
+            background-color: #007aff;
+            color: white;
+            text-decoration: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
+        }
+
+        .get-key-btn:hover {
+            background-color: #0066d6;
+        }
+
+        .get-key-btn:active {
+            transform: scale(0.96);
+        }
+
+        .status-badge {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #27c93f;
+            background: rgba(39, 201, 63, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mac-window">
+        <div id="window-header">
+            <div class="dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="window-title">Authentication Manager</div>
+        </div>
+        
+        <div class="content">
+            <div class="app-icon">
+                <svg viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+            </div>
+            
+            <div class="info-header">System Access Required</div>
+            <div class="info-sub">Generate your unique key to proceed</div>
+            
+            <a href="https://link-hub.net/910280/4RwRQAxmNct6" class="get-key-btn" target="_blank">GET KEY</a>
+            
+            <div class="status-badge">● System Online</div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth Drag-and-Drop functionality
+        const dragItem = document.querySelector("#mac-window");
+        const header = document.querySelector("#window-header");
+
+        let active = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        header.addEventListener("mousedown", dragStart);
+        window.addEventListener("mouseup", dragEnd);
+        window.addEventListener("mousemove", drag);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+            if (e.target === header || header.contains(e.target)) {
+                active = true;
+            }
+        }
+
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            active = false;
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+                xOffset = currentX;
+                yOffset = currentY;
+                setTranslate(currentX, currentY, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+    </script>
+
+</body>
+</html>
