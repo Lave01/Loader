@@ -19,3 +19,5 @@ newSound.SoundId = "rbxassetid://136763125195329"
 newSound.Parent = intro
 newSound.Volume = 1
 newSound:Play()
+
+print("VORO HUB INTRO")
